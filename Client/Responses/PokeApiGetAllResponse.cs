@@ -2,7 +2,7 @@
 
 namespace PokeApi.Client.Responses
 {
-    public class Result
+    public class ResultAll
     {
         [JsonPropertyName("name")]
         public string? Name { get; set; }
@@ -23,6 +23,6 @@ namespace PokeApi.Client.Responses
         public object? Previous { get; set; }
 
         [JsonPropertyName("results")]
-        public List<Result>? Results { get; set; }
+        public List<ResultAll>? Results { get; set; }
     }
 }

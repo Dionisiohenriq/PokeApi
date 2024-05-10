@@ -1,6 +1,6 @@
 @PokeApi_HostAddress = http://localhost:5159
 
-GET {{PokeApi_HostAddress}}/weatherforecast/
+GET {{PokeApi_HostAddress}}/PokeApiClient/GetAllPokemonByLimit
 Accept: application/json
 
 ###

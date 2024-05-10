@@ -25,13 +25,22 @@ namespace PokeApi.Client
         /// <param name="limit">Number of pokémons</param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> GetAllPokemonByLimit(string? offset = "20", string? limit = "20")
+        public async Task<IActionResult> GetAllPokemonByLimit(string offset = "20", string limit = "20")
         {
-            var request = await _httpClient.GetAsync($"{baseUrl}?/offset={offset}&limit={limit}");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, baseUrl?.ToString());
+            request.Headers.Add("offset", offset);
+            request.Headers.Add("limit", limit);
 
-            request.EnsureSuccessStatusCode();
+            HttpResponseMessage response = await _httpClient.SendAsync(request);
 
-            return Ok(request.Content.ReadFromJsonAsync<PokeApiGetAllResponse>());
+            response.EnsureSuccessStatusCode();
+
+            PokeApiGetPokemonResponse? pokemons = await request.Content.ReadFromJsonAsync<PokeApiGetPokemonResponse>();
+
+            if (pokemons == null)
+                return NotFound();
+
+            return Ok(pokemons);
         }
 
         /// <summary>
@@ -42,11 +51,19 @@ namespace PokeApi.Client
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetPokemonByName(string name)
         {
-            var request = await _httpClient.GetAsync($"{baseUrl}/{name}");
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, baseUrl?.ToString());
+            request.Headers.Add("name", name);
 
-            request.EnsureSuccessStatusCode();
+            HttpResponseMessage response = await _httpClient.SendAsync(request);
 
-            return Ok(request.Content.ReadFromJsonAsync<object>());
+            response.EnsureSuccessStatusCode();
+
+            PokeApiGetPokemonResponse? pokemon = await request.Content.ReadFromJsonAsync<PokeApiGetPokemonResponse>();
+
+            if (pokemon == null)
+                return NotFound();
+
+            return Ok(pokemon);
         }
 
         /// <summary>
@@ -62,7 +79,13 @@ namespace PokeApi.Client
 
             HttpResponseMessage response = await _httpClient.SendAsync(request);
 
-            return Ok(response.Content.ReadFromJsonAsync<object>());
+            response.EnsureSuccessStatusCode();
+
+            PokeApiGetPokemonResponse? pokemon = await response.Content.ReadFromJsonAsync<PokeApiGetPokemonResponse>();
+
+            if (pokemon == null) return NotFound();
+
+            return Ok(pokemon);
         }
     }
 }
