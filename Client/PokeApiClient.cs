@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Http.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 using PokeApi.Client.Responses;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace PokeApi.Client
 {
@@ -35,10 +39,9 @@ namespace PokeApi.Client
 
             response.EnsureSuccessStatusCode();
 
-            PokeApiGetPokemonResponse? pokemons = await request.Content.ReadFromJsonAsync<PokeApiGetPokemonResponse>();
+            PokeApiGetAllResponse? pokemons = await response.Content.ReadFromJsonAsync<PokeApiGetAllResponse>();
 
-            if (pokemons == null)
-                return NotFound();
+            if (pokemons == null) return NotFound();
 
             return Ok(pokemons);
         }
@@ -51,17 +54,17 @@ namespace PokeApi.Client
         [HttpGet("name/{name}")]
         public async Task<IActionResult> GetPokemonByName(string name)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, baseUrl?.ToString());
-            request.Headers.Add("name", name);
+            string url = $"{baseUrl}/{name}";
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
 
             HttpResponseMessage response = await _httpClient.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
 
-            PokeApiGetPokemonResponse? pokemon = await request.Content.ReadFromJsonAsync<PokeApiGetPokemonResponse>();
+            PokeApiGetPokemonResponse? pokemon = await response.Content.ReadFromJsonAsync<PokeApiGetPokemonResponse>();
 
-            if (pokemon == null)
-                return NotFound();
+            if (pokemon == null) return NotFound();
 
             return Ok(pokemon);
         }
@@ -74,10 +77,9 @@ namespace PokeApi.Client
         [HttpGet("id/{id}")]
         public async Task<IActionResult> GetPokemonById(string id)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, baseUrl?.ToString());
-            request.Headers.Add("id", id);
+            string url = $"{baseUrl}/{id}";
 
-            HttpResponseMessage response = await _httpClient.SendAsync(request);
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
 
             response.EnsureSuccessStatusCode();
 
